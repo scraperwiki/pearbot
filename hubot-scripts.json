@@ -1,1 +1,8 @@
-[]
+[
+ "xkcd.coffee",
+ "whos-turn.coffee",
+ "twitter.coffee",
+ "rageface.coffee",
+ "location-decision-maker.coffee",
+ "file-brain.coffee"
+]
