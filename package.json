@@ -17,7 +17,7 @@
   "dependencies": {
     "hubot": "2.2.1",
     "hubot-irc": "git://github.com/pboos/hubot-irc.git",
-    "hubot-scripts": ">=2.0.8",
+    "hubot-scripts": "git://github.com/github/hubot-scripts.git",
     "optparse": "1.0.3",
     "cron": "0.3.3",
     "underscore": "1.3.3"

@@ -23,7 +23,7 @@ module.exports = (robot) ->
   cron_afternoon = '00 30 16 * * 2-6'
   #cron_afternoon = '*/1 * * * * *'
   cron_clear_cache   = '00 00 06 * * 2-6'
-  channel = '#ehgtest'
+  channel = '#ScraperWikians'
 
   robot.brain.on 'loaded', ->
     if robot.brain.data.pears
@@ -34,8 +34,7 @@ module.exports = (robot) ->
       if pair.time == time and not pair.asked_if_paired
         pairer = robot.userForName pair.pairer
         pairee = robot.userForName pair.pairee
-        delete pairer.room
-        delete pairee.room
+        delete pairer.room and delete pairee.room
         robot.send pairer, "you should've paired with #{pair.pairee} this #{pair.time}#{pair.task} - did you?"
         robot.send pairee, "you should've paired with #{pair.pairer} this #{pair.time}#{pair.task} - did you?"
         pair.asked_if_paired = true
@@ -59,10 +58,12 @@ module.exports = (robot) ->
         robot.messageRoom channel, "#{pair.pairee} and #{pair.pairer} didn't pair last #{pair.time}, or didn't respond when i asked them >:("
 
       cache = []
+      robot.brain.data.pear = cache
     start: true
 
+  # Ask the pair if they've actually paired
   #TODO: fork hubot-irc so we can use respond instead of hear
-  robot.respond /(yes|no)$/i, (msg) ->
+  robot.hear /(yes|no)$/i, (msg) ->
     user = msg.message.user
     response = msg.match[1].toLowerCase()
     unless user.room
@@ -77,9 +78,11 @@ module.exports = (robot) ->
         else
           robot.messageRoom channel, "#{pair.pairee} and #{pair.pairer} didn't pair this #{pair.time} :("
         cache = _.without cache, pair
+        robot.brain.data.pear = cache
       else
         robot.send user, "sorry, what?"
 
+  # Start a pairing
   robot.respond /pair with (\w+) this (morning|afternoon)(?:on )?(.+)?/i, (msg) ->
     return unless msg.message.user.room
     task = msg.match[3]
@@ -97,6 +100,7 @@ module.exports = (robot) ->
           time: time
           task: task
         robot.messageRoom channel, "#{pairer.name} will pair with #{pairee.name} this #{time}#{task}"
+        robot.brain.data.pear = cache
       else
         other_person = pairee_paired.pairer if pairee_paired.pairee == pairee.name
         other_person = pairee_paired.pairee if pairee_paired.pairer == pairee.name
@@ -104,6 +108,7 @@ module.exports = (robot) ->
     else
       robot.messageRoom channel, "i don't know #{msg.match[1]}"
 
+  # Cancel a pairing
   robot.respond /cancel pair with (\w+) this (morning|afternoon)$/i, (msg) ->
     return unless msg.message.user.room
 
@@ -117,6 +122,7 @@ module.exports = (robot) ->
       if pair?
         robot.messageRoom channel, "ok, pair cancelled"
         cache = _.without cache, pair
+        robot.brain.data.pear = cache
       else
         robot.messageRoom channel, "i have no record of that pairing"
     else
