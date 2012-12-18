@@ -65,16 +65,17 @@ module.exports = (robot) ->
       robot.brain.data.pear = cache
     start: true
 
-  robot.hear /(hello|hi|hey|ello|hai|hiya|morning) (.+)/i, (msg) ->
+  robot.hear /^(hello|hi|hey|ello|hai|hiya|morning) (\w+)/i, (msg) ->
     user = msg.message.user
     console.log 'USER', user
     target = msg.match[2].toLowerCase().trim()
+    greeting = msg.match[1].toLowerCase().trim()
     
     console.log 'TARGET', target
     if target == 'pearbot'
       robot.messageRoom channel, "HAI #{user.name.toUpperCase()}!!111 :D"
     else
-      robot.messageRoom channel, "hi #{target}"
+      robot.messageRoom channel, "#{greeting} #{target}"
  
   # Ask the pair if they've actually paired
   #TODO: fork hubot-irc so we can use respond instead of hear
