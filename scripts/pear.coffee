@@ -39,6 +39,9 @@ module.exports = (robot) ->
         robot.send pairee, "you should've paired with #{pair.pairer} this #{pair.time}#{pair.task} - did you?"
         pair.asked_if_paired = true
 
+  slack_message = ->
+    robot.messageRoom channel, "SLACK TIME!!!"
+    
   new cron_job
     cronTime: cron_morning
     onTick: ->
@@ -49,6 +52,7 @@ module.exports = (robot) ->
     cronTime: cron_afternoon
     onTick: ->
       nagger 'afternoon'
+      slack_message()
     start: true
 
   new cron_job
@@ -60,6 +64,11 @@ module.exports = (robot) ->
       cache = []
       robot.brain.data.pear = cache
     start: true
+
+  robot.respond /(hello|hi|hey|ello)/i, (msg) ->
+    user = msg.message.user
+    console.log user
+    robot.messageRoom channel, "HAI #{user.name.toUpperCase()}!!111 :D"
 
   # Ask the pair if they've actually paired
   #TODO: fork hubot-irc so we can use respond instead of hear
